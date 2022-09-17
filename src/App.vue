@@ -1,32 +1,23 @@
 <template>
   <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
+    <header-item/>
     <router-view/>
+    <footer-item/>
   </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+// eslint-disable-next-line import/extensions
+import HeaderItem from '@/components/HeaderItem';
+// eslint-disable-next-line import/extensions
+import FooterItem from '@/components/FooterItem';
 
-nav {
-  padding: 30px;
+export default {
+  components: {
+    HeaderItem,
+    FooterItem,
+  },
+};
+</script>
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-</style>
+<style lang="scss"></style>
