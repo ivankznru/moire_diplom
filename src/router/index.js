@@ -1,20 +1,29 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import MainView from "@/views/MainView";
-import ProductView from "@/views/ProductView";
+// eslint-disable-next-line import/extensions
+import MainView from '@/views/MainView';
+// eslint-disable-next-line import/extensions
+import ProductView from '@/views/ProductView';
+// eslint-disable-next-line import/extensions
+import CartView from '@/views/CartView';
 
 Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
     name: 'main',
     component: MainView,
+    path: '/',
   },
   {
-    path: '/product/:id',
     name: 'product',
     component: ProductView,
+    path: '/product/:id',
+  },
+  {
+    name: 'cart',
+    component: CartView,
+    path: '/cart',
   },
 ];
 
