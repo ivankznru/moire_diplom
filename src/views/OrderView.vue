@@ -4,8 +4,8 @@
 
 <script>
 export default {
-  name: "OrderView"
-}
+  name: 'OrderView',
+};
 </script>
 
 <style scoped>
