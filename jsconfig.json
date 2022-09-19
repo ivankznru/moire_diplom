@@ -1,10 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "esnext",
-    "baseUrl": "./",
-    "moduleResolution": "node",
-    "paths": {
+    "odule\": \"esnext\",\n    \"baseUrl\": \"./\",\n    \"moduleResolution\": \"node\",\n    \"ptarget": "es5",
+    "maths": {
       "@/*": [
         "src/*"
       ]
