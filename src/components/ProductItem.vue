@@ -1,9 +1,8 @@
 <template>
   <li class="catalog__item">
     <router-link class="catalog__pic" :to="{name: 'product', params: {id: product.id}}">
-      <img :src="product.image" :alt="product.title">
+      <img :src="productImage" :alt="product.title">
     </router-link>
-
     <h3 class="catalog__title">
       <a href="#">
         {{ product.title }}
@@ -26,6 +25,7 @@
 // eslint-disable-next-line import/extensions
 import BaseColor from '@/components/BaseColor';
 import numberFormat from '@/helpers/numberFormat';
+import { NO_IMAGE } from '@/config';
 
 export default {
   name: 'ProductItem',
@@ -33,11 +33,24 @@ export default {
   props: ['product', 'colors'],
   data() {
     return {
-      currentColor: null,
+      currentColor: this.product.colors[0].color.id,
     };
   },
   filters: {
     numberFormat,
+  },
+  computed: {
+    productImage() {
+      let value;
+      // eslint-disable-next-line no-plusplus
+      for (let i = 0; i < this.product.colors.length; i++) {
+        if (this.currentColor === this.product.colors[i].color.id) {
+          value = this.product.colors[i].gallery ? this.product.colors[i].gallery[0].file.url : `${NO_IMAGE}`;
+          return value;
+        }
+      }
+      return value;
+    },
   },
 };
 </script>

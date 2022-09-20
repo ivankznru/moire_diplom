@@ -27,7 +27,7 @@
         </div>
 
         <base-loader loader-title="Загрузка товаров" v-if="productsLoading"/>
-        <product-list :products="products" v-else/>
+        <product-list :products="products" :colors="colorsProduct" v-else/>
 
         <base-pagination v-model="page" :count="countProducts" :per-page="productsPerPage"/>
 
@@ -37,17 +37,21 @@
 </template>
 
 <script>
-import stringProduct from '@/helpers/stringProduct'
-import BaseLoader from '@/components/BaseLoader'
-import ProductFilter from '@/components/ProductFilter'
-import BasePagination from '@/components/BasePagination'
-import ProductList from '@/components/ProductList'
-import axios from 'axios'
-import { API_BASE_URL, NO_IMAGE } from '@/config'
+import stringProduct from '@/helpers/stringProduct';
+// eslint-disable-next-line import/extensions
+import BaseLoader from '@/components/BaseLoader';
+// eslint-disable-next-line import/extensions
+import ProductFilter from '@/components/ProductFilter';
+// eslint-disable-next-line import/extensions
+import BasePagination from '@/components/BasePagination';
+// eslint-disable-next-line import/extensions
+import ProductList from '@/components/ProductList';
+import axios from 'axios';
+import { API_BASE_URL } from '@/config';
 
 export default {
   name: 'MainView',
-  data () {
+  data() {
     return {
       page: 1,
       productsPerPage: 6,
@@ -62,35 +66,41 @@ export default {
       productsLoading: false,
       productsLoadingFailed: false,
 
-      productsData: null
-    }
+      productsData: null,
+    };
   },
+
   components: {
     BasePagination,
     ProductList,
     ProductFilter,
-    BaseLoader
+    BaseLoader,
   },
   computed: {
-    products () {
+    products() {
       return this.productsData
         ? this.productsData.items.map((product) => ({
           ...product,
-          image: product.colors[0].gallery
-            ? product?.colors[0]?.gallery[0].file.url
-            : `${NO_IMAGE}`
         }))
-        : []
+        : [];
     },
-    countProducts () {
-      return this.productsData ? this.productsData.pagination.total : 0
-    }
+    countProducts() {
+      return this.productsData ? this.productsData.pagination.total : 0;
+    },
+    colorsProduct() {
+      return this.productsData ? this.productsData.items.map((product) => ({
+        ...product.colors.map((color) => ({
+          ...color.color,
+        })),
+      })) : [];
+    },
   },
   methods: {
-    async loadProducts () {
-      this.productsLoading = true
-      const response = await axios(`${API_BASE_URL}/api/products`, {
+    async loadProducts() {
+      this.productsLoading = true;
+      const response = await axios({
         method: 'GET',
+        url: `${API_BASE_URL}/api/products`,
         params: {
           page: this.page,
           limit: this.productsPerPage,
@@ -99,43 +109,42 @@ export default {
           seasonIds: this.filterSeason,
           colorIds: this.filterColor,
           minPrice: this.filterPriceFrom,
-          maxPrice: this.filterPriceTo
-        }
-      })
-      clearTimeout(this.loadProductsTimer)
-      this.loadProductsTimer = setTimeout(() => {
-        this.productsData = response.data
-        this.productsLoading = false
-      }, 1000)
-    }
+          maxPrice: this.filterPriceTo,
+        },
+      });
+      this.productsData = response.data;
+      if (response.data) {
+        this.productsLoading = false;
+      }
+    },
   },
   watch: {
-    page () {
-      this.loadProducts()
+    page() {
+      this.loadProducts();
     },
-    filterPriceFrom () {
-      this.loadProducts()
+    filterPriceFrom() {
+      this.loadProducts();
     },
-    filterPriceTo () {
-      this.loadProducts()
+    filterPriceTo() {
+      this.loadProducts();
     },
-    filterCategoryId () {
-      this.loadProducts()
+    filterCategoryId() {
+      this.loadProducts();
     },
-    filterSeason () {
-      this.loadProducts()
+    filterSeason() {
+      this.loadProducts();
     },
-    filterMaterial () {
-      this.loadProducts()
+    filterMaterial() {
+      this.loadProducts();
     },
-    filterColor () {
-      this.loadProducts()
-    }
+    filterColor() {
+      this.loadProducts();
+    },
   },
-  created () {
-    this.loadProducts()
-  }
-}
+  created() {
+    this.loadProducts();
+  },
+};
 </script>
 
 <style scoped>

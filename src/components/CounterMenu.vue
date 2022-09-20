@@ -6,8 +6,9 @@
         <use xlink:href="img/svg/sprite.svg#icon-minus"></use>
       </svg>
     </button>
+
     <label for="count-one">
-      <input type="text" v-model.number="amount" name="count" id="count-one">
+      <input type="number" :value="amount" name="count" id="count-one">
     </label>
 
     <button class="button" type="button" aria-label="Добавить один товар"
