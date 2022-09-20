@@ -1,10 +1,9 @@
 <template>
-
 </template>
 
 <script>
 export default {
-  name: 'OrderRegistrationView',
+  name: 'OrderInfoView',
 };
 </script>
 

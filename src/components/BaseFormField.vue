@@ -1,5 +1,5 @@
 <template>
-  <label class="form__label">
+  <label class="form__label" :for="name">
     <slot/>
     <span class="form__value">{{ title }}</span>
     <span class="form__error" v-if="error">{{ error }}</span>
@@ -9,7 +9,7 @@
 <script>
 export default {
   name: 'BaseFormField',
-  props: ['title', 'error'],
+  props: ['title', 'error', 'name'],
 };
 </script>
 
