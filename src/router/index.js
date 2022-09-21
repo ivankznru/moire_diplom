@@ -9,44 +9,37 @@ import CartView from '@/views/CartView';
 // eslint-disable-next-line import/extensions
 import OrderView from '@/views/OrderView';
 // eslint-disable-next-line import/extensions
-import OrderRegistrationView from '@/views/OrderRegistrationView';
+import OrderInfoView from '@/views/OrderInfoView';
 // eslint-disable-next-line import/extensions
 import notFoundView from '@/views/notFoundView';
 
 Vue.use(VueRouter);
 
-const routes = [
-  {
-    name: 'main',
-    component: MainView,
-    path: '/',
-  },
-  {
-    name: 'product',
-    component: ProductView,
-    path: '/product/:id',
-  },
-  {
-    name: 'cart',
-    component: CartView,
-    path: '/cart',
-  },
-  {
-    name: 'order',
-    component: OrderView,
-    path: '/order',
-  },
-  {
-    name: 'orderRegistration',
-    component: OrderRegistrationView,
-    path: '/order/:id',
-  },
-  {
-    name: 'notFound',
-    component: notFoundView,
-    path: '*',
-  },
-];
+const routes = [{
+  name: 'main',
+  component: MainView,
+  path: '/',
+}, {
+  name: 'product',
+  component: ProductView,
+  path: '/product/:id',
+}, {
+  name: 'cart',
+  component: CartView,
+  path: '/cart',
+}, {
+  name: 'order',
+  component: OrderView,
+  path: '/order',
+}, {
+  name: 'orderInfo',
+  component: OrderInfoView,
+  path: '/order/:id',
+}, {
+  name: 'notFound',
+  component: notFoundView,
+  path: '*',
+}];
 
 const router = new VueRouter({
   routes,

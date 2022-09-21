@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import { API_BASE_URL } from '@/config';
-// import router from '@/router';
+import router from '@/router';
 
 Vue.use(Vuex);
 
@@ -166,7 +166,20 @@ export default new Vuex.Store({
       } catch {
         context.commit('syncCartProducts');
       }
-    }
-    ,
+    },
+    async loadOrderInfoView(context, orderId) {
+      try {
+        const response = await axios({
+          method: 'GET',
+          url: `${API_BASE_URL}/api/orders/${orderId}`,
+          params: {
+            userAccessKey: context.state.userAccessKey,
+          },
+        });
+        context.commit('updateOrderInfo', response.data);
+      } catch {
+        await router.replace({ name: 'notFound' });
+      }
+    },
   },
 });
