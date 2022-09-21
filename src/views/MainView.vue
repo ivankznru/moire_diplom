@@ -20,13 +20,15 @@
                       :season.sync="filterSeason"/>
       <section class="catalog">
 
-        <div v-if="products.length === 0 && !productsLoading">
+        <div v-if="products.length === 0 && !productsLoading && !productsLoadingFailed">
           <h4>
             Товаров, соответствующих вашему запросу, не обнаружено
           </h4>
         </div>
 
         <base-loader loader-title="Загрузка товаров" v-if="productsLoading"/>
+        <h2 v-else-if="productsLoadingFailed">Ошибка загрузки товаров, перезагрузите пожалуйста
+          страницу</h2>
         <product-list :products="products" :colors="colorsProduct" v-else/>
 
         <base-pagination v-model="page" :count="countProducts" :per-page="productsPerPage"/>
@@ -97,24 +99,30 @@ export default {
   },
   methods: {
     async loadProducts() {
-      this.productsLoading = true;
-      const response = await axios({
-        method: 'GET',
-        url: `${API_BASE_URL}/api/products`,
-        params: {
-          page: this.page,
-          limit: this.productsPerPage,
-          categoryId: this.filterCategoryId,
-          materialIds: this.filterMaterial,
-          seasonIds: this.filterSeason,
-          colorIds: this.filterColor,
-          minPrice: this.filterPriceFrom,
-          maxPrice: this.filterPriceTo,
-        },
-      });
-      this.productsData = response.data;
-      if (response.data) {
+      try {
+        this.productsLoading = true;
+        this.productsLoadingFailed = false;
+        const response = await axios({
+          method: 'GET',
+          url: `${API_BASE_URL}/api/products`,
+          params: {
+            page: this.page,
+            limit: this.productsPerPage,
+            categoryId: this.filterCategoryId,
+            materialIds: this.filterMaterial,
+            seasonIds: this.filterSeason,
+            colorIds: this.filterColor,
+            minPrice: this.filterPriceFrom,
+            maxPrice: this.filterPriceTo,
+          },
+        });
+        this.productsData = response.data;
+        if (response.data) {
+          this.productsLoading = false;
+        }
+      } catch {
         this.productsLoading = false;
+        this.productsLoadingFailed = true;
       }
     },
   },

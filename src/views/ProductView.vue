@@ -91,6 +91,7 @@
         </div>
       </div>
 
+      <!-- На случай, если вдруг в API появится контент с "Информацией" и "Доставкой"
       <div class="item__desc">
         <ul class="tabs">
           <li class="tabs__item">
@@ -125,6 +126,7 @@
 
         </div>
       </div>
+      -->
     </section>
   </main>
 </template>
@@ -142,6 +144,8 @@ import BaseColor from '@/components/BaseColor';
 import BaseSelect from '@/components/BaseSelect';
 import { API_BASE_URL, NO_IMAGE } from '@/config';
 import { mapActions, mapMutations } from 'vuex';
+// eslint-disable-next-line import/no-cycle
+import router from '@/router';
 
 export default {
   name: 'ProductView',
@@ -221,8 +225,18 @@ export default {
     },
 
     async loadProduct() {
-      const response = await axios(`${API_BASE_URL}/api/products/${this.$route.params.id}`);
-      this.productData = response.data;
+      try {
+        this.productLoading = true;
+        this.productsLoadingFailed = false;
+        const response = await axios(`${API_BASE_URL}/api/products/${this.$route.params.id}`);
+        this.productData = response.data;
+        if (response.data) {
+          this.productLoading = false;
+        }
+      } catch {
+        this.productsLoadingFailed = true;
+        await router.replace({ name: 'notFound' });
+      }
     },
   },
   watch: {
