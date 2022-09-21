@@ -6,6 +6,10 @@ import router from '@/router';
 
 Vue.use(Vuex);
 
+// const client = axios.create({
+//   baseURL: API_BASE_URL,
+// });
+
 export default new Vuex.Store({
   state: {
     cartProducts: [],
@@ -32,8 +36,8 @@ export default new Vuex.Store({
       });
     },
     cartTotalPrice(state, getters) {
-      // eslint-disable-next-line max-len
-      return getters.cartDetailProducts.reduce((acc, item) => (item.product.price * item.amount) + acc, 0);
+      return getters.cartDetailProducts
+        .reduce((acc, item) => (item.product.price * item.amount) + acc, 0);
     },
     totalProducts(state, getters) {
       return getters.cartDetailProducts.reduce((acc, item) => (item.amount) + acc, 0);
@@ -52,8 +56,7 @@ export default new Vuex.Store({
       basketItemId,
       amount,
     }) {
-      // eslint-disable-next-line no-shadow
-      const item = state.cartProducts.find((item) => item.basketItemId === basketItemId);
+      const item = state.cartProducts.find((p) => p.basketItemId === basketItemId);
       if (item) {
         item.amount = amount;
       }
