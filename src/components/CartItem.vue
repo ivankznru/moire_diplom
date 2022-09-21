@@ -42,8 +42,7 @@
 
 <script>
 import numberFormat from '@/helpers/numberFormat';
-// eslint-disable-next-line import/extensions
-import CounterMenu from '@/components/CounterMenu';
+import CounterMenu from '@/components/CounterMenu.vue';
 import { mapActions } from 'vuex';
 
 export default {

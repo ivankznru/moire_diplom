@@ -3,9 +3,8 @@
     <svg width="30" height="21" fill="currentColor">
       <use xlink:href="img/svg/sprite.svg#icon-cart"></use>
     </svg>
-    <span class="header__count" aria-label="Количество товаров">{{
-        $store.state.cartProducts.length
-      }}</span>
+    <span class="header__count" aria-label="Количество товаров">
+      {{ $store.state.cartProducts.length }}</span>
   </router-link>
 </template>
 

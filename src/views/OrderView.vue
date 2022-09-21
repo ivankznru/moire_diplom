@@ -79,18 +79,11 @@
 </template>
 
 <script>
-// eslint-disable-next-line import/extensions
-import BaseLoader from '@/components/BaseLoader';
-// eslint-disable-next-line import/extensions
-import BaseFormText from '@/components/BaseFormText';
-// eslint-disable-next-line import/extensions
-import BaseFormTextarea from '@/components/BaseFormTextarea';
-// eslint-disable-next-line import/extensions
-import CartBlock from '@/components/CartBlock';
-// eslint-disable-next-line import/extensions
-import CartOption from '@/components/CartOption';
-// eslint-disable-next-line import/no-cycle
-import router from '@/router';
+import BaseLoader from '@/components/BaseLoader.vue';
+import BaseFormText from '@/components/BaseFormText.vue';
+import BaseFormTextarea from '@/components/BaseFormTextarea.vue';
+import CartBlock from '@/components/CartBlock.vue';
+import CartOption from '@/components/CartOption.vue';
 import { API_BASE_URL } from '@/config';
 import { mapGetters } from 'vuex';
 import axios from 'axios';
@@ -137,7 +130,7 @@ export default {
         });
         this.$store.commit('resetCart');
         this.$store.commit('updateOrderInfo', response.data);
-        await router.push({
+        await this.$router.push({
           name: 'orderInfo',
           params: { id: response.data.id },
         });

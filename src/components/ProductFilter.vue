@@ -79,8 +79,7 @@
 </template>
 
 <script>
-// eslint-disable-next-line import/extensions
-import BaseColor from '@/components/BaseColor';
+import BaseColor from '@/components/BaseColor.vue';
 import axios from 'axios';
 import { API_BASE_URL } from '@/config';
 

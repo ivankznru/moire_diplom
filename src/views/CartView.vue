@@ -51,8 +51,7 @@
 </template>
 
 <script>
-// eslint-disable-next-line import/extensions
-import CartItem from '@/components/CartItem';
+import CartItem from '@/components/CartItem.vue';
 import { mapGetters } from 'vuex';
 import stringProduct from '@/helpers/stringProduct';
 import numberFormat from '@/helpers/numberFormat';

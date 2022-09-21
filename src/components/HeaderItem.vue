@@ -12,19 +12,22 @@
       <a class="header__tel" href="tel:8 800 600 90 09">
         8 800 600 90 09
       </a>
-
       <CartIndicator/>
     </div>
   </header>
 </template>
 
 <script>
-// eslint-disable-next-line import/extensions
-import CartIndicator from '@/components/CartIndicator';
+import CartIndicator from '@/components/CartIndicator.vue';
 
 export default {
   name: 'HeaderItem',
   components: { CartIndicator },
+  data() {
+    return {
+      show: true,
+    };
+  },
 };
 </script>
 

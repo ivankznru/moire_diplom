@@ -1,5 +1,4 @@
-// eslint-disable-next-line import/extensions
-import BaseFormField from '@/components/BaseFormField';
+import BaseFormField from '@/components/BaseFormField.vue';
 
 export default {
   props: {

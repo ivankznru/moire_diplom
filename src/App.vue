@@ -7,10 +7,8 @@
 </template>
 
 <script>
-// eslint-disable-next-line import/extensions
-import HeaderItem from '@/components/HeaderItem';
-// eslint-disable-next-line import/extensions
-import FooterItem from '@/components/FooterItem';
+import HeaderItem from '@/components/HeaderItem.vue';
+import FooterItem from '@/components/FooterItem.vue';
 import { mapActions, mapMutations } from 'vuex';
 
 export default {
@@ -34,6 +32,7 @@ export default {
 
 <style lang="scss">
 #app {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100vh;

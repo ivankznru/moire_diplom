@@ -87,8 +87,7 @@
 </template>
 
 <script>
-// eslint-disable-next-line import/extensions
-import CartBlock from '@/components/CartBlock';
+import CartBlock from '@/components/CartBlock.vue';
 
 export default {
   name: 'OrderInfoView',
@@ -104,7 +103,6 @@ export default {
       return this.orderData.basket.items.reduce((acc, item) => item.quantity + acc, 0);
     },
     totalPrice() {
-      // eslint-disable-next-line max-len
       return this.orderData.totalPrice;
     },
     priceDelivery() {
@@ -112,7 +110,6 @@ export default {
     },
   },
   watch: {
-    // eslint-disable-next-line func-names
     '$route.params.id': {
       handler() {
         this.$store.dispatch('loadOrderInfoView', +this.$route.params.id);

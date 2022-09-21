@@ -1,17 +1,11 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-// eslint-disable-next-line import/extensions
-import MainView from '@/views/MainView';
-// eslint-disable-next-line import/extensions
-import ProductView from '@/views/ProductView';
-// eslint-disable-next-line import/extensions
-import CartView from '@/views/CartView';
-// eslint-disable-next-line import/extensions
-import OrderView from '@/views/OrderView';
-// eslint-disable-next-line import/extensions
-import OrderInfoView from '@/views/OrderInfoView';
-// eslint-disable-next-line import/extensions
-import notFoundView from '@/views/notFoundView';
+import MainView from '@/views/MainView.vue';
+import ProductView from '@/views/ProductView.vue';
+import CartView from '@/views/CartView.vue';
+import OrderView from '@/views/OrderView.vue';
+import OrderInfoView from '@/views/OrderInfoView.vue';
+import notFoundView from '@/views/notFoundView.vue';
 
 Vue.use(VueRouter);
 
