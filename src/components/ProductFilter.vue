@@ -1,3 +1,4 @@
+
 <template>
   <aside class="filter">
     <h2 class="filter__title">Фильтры</h2>

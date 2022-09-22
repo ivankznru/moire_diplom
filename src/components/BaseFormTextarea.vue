@@ -1,7 +1,7 @@
 <template>
-  <BaseFormField :title="title" :error="error" :name="name">
-      <textarea class="form__input form__input--area" :name="name" :id="name"
-                :placeholder="placeholder" v-model="dataValue"></textarea>
+  <BaseFormField :form="form">
+      <textarea class="form__input form__input--area" :id="form.name"
+                :placeholder="form.placeholder" :value="value" @input="onInput"></textarea>
   </BaseFormField>
 </template>
 

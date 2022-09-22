@@ -1,28 +1,6 @@
 <template>
   <main class="content container">
-    <div class="content__top">
-      <ul class="breadcrumbs">
-        <li class="breadcrumbs__item">
-          <router-link class="breadcrumbs__link" :to="{ name: 'main' }">
-            Каталог
-          </router-link>
-        </li>
-        <li class="breadcrumbs__item">
-          <span class="breadcrumbs__link">
-            Корзина
-          </span>
-        </li>
-      </ul>
-
-      <div class="content__row">
-        <h1 class="content__title">
-          Корзина
-        </h1>
-        <span class="content__info">
-          {{ totalProducts }} {{ stringProduct(totalProducts) }}
-        </span>
-      </div>
-    </div>
+    <page-title :title="$options.pageData.pageTitle" :items="paths()"/>
 
     <section class="cart">
       <form class="cart__form form" action="#" method="POST">
@@ -34,15 +12,15 @@
 
         <div class="cart__block">
           <p class="cart__desc">
-            Мы&nbsp;посчитаем стоимость доставки на&nbsp;следующем этапе
+            {{ $options.pageData.cartDescription }}
           </p>
           <p class="cart__price">
-            Итого: <span>{{ cartTotalPrice | numberFormat }}₽</span>
+            {{ $options.pageData.total }} <span>{{ cartTotalPrice | numberFormat }}₽</span>
           </p>
 
           <router-link tag="button" class="cart__button button button--primary"
                        :to="{ name: 'order' }" type="submit">
-            Оформить заказ
+            {{ $options.pageData.buttonText }}
           </router-link>
         </div>
       </form>
@@ -53,19 +31,23 @@
 <script>
 import CartItem from '@/components/CartItem.vue';
 import { mapGetters } from 'vuex';
-import stringProduct from '@/helpers/stringProduct';
 import numberFormat from '@/helpers/numberFormat';
+import PageTitle from '@/components/PageTitle.vue';
 
 export default {
   name: 'CartView',
-  components: { CartItem },
+  components: {
+    CartItem,
+    PageTitle,
+  },
+  pageData: {
+    pageTitle: 'Корзина',
+    buttonText: 'Оформить заказ',
+    total: 'Итого:',
+    cartDescription: 'Мы\u00A0посчитаем стоимость доставки на\u00A0следующем этапе',
+  },
   filters: {
     numberFormat,
-  },
-  data() {
-    return {
-      stringProduct,
-    };
   },
   computed: {
     ...mapGetters({
@@ -73,6 +55,16 @@ export default {
       totalProducts: 'totalProducts',
       cartTotalPrice: 'cartTotalPrice',
     }),
+  },
+  methods: {
+    paths() {
+      return [
+        {
+          id: 1,
+          title: `${this.$options.pageData.pageTitle}`,
+        },
+      ];
+    },
   },
 };
 </script>

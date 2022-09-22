@@ -1,7 +1,7 @@
 <template>
-  <BaseFormField :title="title" :error="error" :name="name">
-    <input class="form__input" v-model="dataValue" :type="type" :id="name"
-           :placeholder="placeholder" :name="name">
+  <BaseFormField :form="form" :error="error">
+    <input class="form__input" :value="value" @input="onInput" :type="form.type" :id="form.name"
+           :placeholder="form.placeholder" :name="form.name">
   </BaseFormField>
 </template>
 
@@ -14,6 +14,9 @@ export default {
   props: {
     type: {
       default: 'text',
+    },
+    error: {
+      type: String,
     },
   },
 };
