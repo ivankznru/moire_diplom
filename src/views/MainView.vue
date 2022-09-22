@@ -4,10 +4,7 @@
 
     <div class="content__catalog">
 
-      <product-filter :price-from.sync="filterPriceFrom" :price-to.sync="filterPriceTo"
-                      :category-id.sync="filterCategoryId" :color.sync="filterColor"
-                      :page.sync="page" :material.sync="filterMaterial"
-                      :season.sync="filterSeason"/>
+      <product-filter :page.sync="page" ref="filter"/>
       <section class="catalog">
 
         <div v-if="!products.length && !productsLoading && !productsLoadingFailed">
@@ -60,12 +57,6 @@ export default {
     return {
       page: 1,
       productsPerPage: 6,
-      filterPriceFrom: 0,
-      filterPriceTo: 0,
-      filterCategoryId: 0,
-      filterColor: [],
-      filterMaterial: [],
-      filterSeason: [],
 
       displayingProducts: [
         {
@@ -123,6 +114,15 @@ export default {
     },
   },
   methods: {
+    watchFilter(value) {
+      if (typeof this.$route.query[value] === 'string'
+        && this.$route.query[value] !== this.$route.query.categoryId
+        && this.$route.query[value] !== this.$route.query.priceFrom
+        && this.$route.query[value] !== this.$route.query.priceTo) {
+        return Array(this.$route.query[value]);
+      }
+      return this.$route.query[value];
+    },
     async loadProducts() {
       try {
         this.productsLoading = true;
@@ -133,12 +133,12 @@ export default {
           params: {
             page: this.page,
             limit: this.productsPerPage,
-            categoryId: this.filterCategoryId,
-            materialIds: this.filterMaterial,
-            seasonIds: this.filterSeason,
-            colorIds: this.filterColor,
-            minPrice: this.filterPriceFrom,
-            maxPrice: this.filterPriceTo,
+            categoryId: this.watchFilter('categoryId'),
+            materialIds: this.watchFilter('materialIds'),
+            seasonIds: this.watchFilter('seasonIds'),
+            colorIds: this.watchFilter('colorIds'),
+            minPrice: this.watchFilter('priceFrom'),
+            maxPrice: this.watchFilter('priceTo'),
           },
         });
         this.productsData = response.data;
@@ -155,30 +155,17 @@ export default {
     page() {
       this.loadProducts();
     },
-    filterPriceFrom() {
-      this.loadProducts();
-    },
-    filterPriceTo() {
-      this.loadProducts();
-    },
-    filterCategoryId() {
-      this.loadProducts();
-    },
-    filterSeason() {
-      this.loadProducts();
-    },
-    filterMaterial() {
-      this.loadProducts();
-    },
-    filterColor() {
-      this.loadProducts();
-    },
     productsPerPage() {
       this.loadProducts();
     },
+    '$route.query': {
+      handler() {
+        this.loadProducts();
+      },
+    },
   },
-  created() {
-    this.loadProducts();
+  async created() {
+    await this.loadProducts();
   },
 };
 </script>

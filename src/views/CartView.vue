@@ -10,20 +10,20 @@
           </ul>
         </div>
 
-        <div class="cart__block">
-          <p class="cart__desc">
-            {{ $options.pageData.cartDescription }}
-          </p>
-          <p class="cart__price">
-            {{ $options.pageData.total }} <span>{{ cartTotalPrice | numberFormat }}₽</span>
-          </p>
-
-          <router-link tag="button" class="cart__button button button--primary"
-                       :to="{ name: 'order' }" type="submit">
-            {{ $options.pageData.buttonText }}
-          </router-link>
-        </div>
       </form>
+      <div class="cart__block">
+        <p class="cart__desc">
+          {{ $options.pageData.cartDescription }}
+        </p>
+        <p class="cart__price">
+          {{ $options.pageData.total }} <span>{{ cartTotalPrice | numberFormat }} ₽</span>
+        </p>
+
+        <router-link tag="button" class="cart__button button button--primary"
+                     :to="{ name: 'order' }" type="submit">
+          {{ $options.pageData.buttonText }}
+        </router-link>
+      </div>
     </section>
   </main>
 </template>
