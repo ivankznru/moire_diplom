@@ -3,93 +3,97 @@
     <BaseLoader loader-title="Обработка заказа"></BaseLoader>
   </main>
   <main class="content container" v-else>
-    <div class="content__top">
-      <ul class="breadcrumbs">
-        <li class="breadcrumbs__item">
-          <router-link class="breadcrumbs__link" :to="{ name: 'main' }">
-            Каталог
-          </router-link>
-        </li>
-        <li class="breadcrumbs__item">
-          <router-link class="breadcrumbs__link" :to="{ name: 'cart' }">
-            Корзина
-          </router-link>
-        </li>
-        <li class="breadcrumbs__item">
-          <span class="breadcrumbs__link">
-            Оформление заказа
-          </span>
-        </li>
-      </ul>
 
-      <div class="content__row">
-        <h1 class="content__title">
-          Оформление заказа
-        </h1>
-      </div>
-    </div>
+    <page-title :title="$options.pageData.pageTitle" :items="paths()"/>
 
     <section class="cart">
-      <form class="cart__form form" action="#" method="POST" @submit.prevent="order">
-        <div class="cart__field">
-          <div class="cart__data">
-            <BaseFormText title="ФИО" :error="formError.name" v-model="formData.name"
-                          placeholder="Введите ваше полное имя" name="name"/>
 
-            <BaseFormText title="Адрес доставки" :error="formError.address"
-                          v-model="formData.address"
-                          placeholder="Введите ваш адрес" name="address"/>
+      <form-generation
+        :error="formError"
+        :data="formData"
+        :form="$options.pageData.forms"
+        :submit-form="order"
+        :button-text="$options.pageData.pageButtonText"
+        :form-error-message="formErrorMessage"
+        :deliveries-data="deliveriesData"
+        :products="products"
+        :total-price="totalPrice"
+        :total-products="totalProducts"
+        :current-price-delivery="currentPriceDelivery"
+        @sendForm="order()">
 
-            <BaseFormText title="Телефон" :error="formError.phone" v-model="formData.phone"
-                          placeholder="+7(999)-999-99-99" name="address" type="tel"/>
+        <CartOption title="Доставка" name="delivery" :items="deliveriesData"
+                    :current-value.sync="currentDelivery"/>
 
-            <BaseFormText title="Email" :error="formError.email" v-model="formData.email"
-                          placeholder="Введи ваш Email" name="address" type="email"/>
+        <CartOption title="Оплата" name="pay" :items="paymentsData"
+                    :current-value.sync="currentPayment"/>
+      </form-generation>
 
-            <BaseFormTextarea title="Комментарий к заказу" :error="formError.comments"
-                              placeholder="Ваши пожелания" name="comments"
-                              v-model="formData.comments"/>
-          </div>
-
-          <CartOption title="Доставка" name="delivery" :items="deliveriesData"
-                      :current-value.sync="currentDelivery"/>
-
-          <CartOption title="Оплата" name="pay" :items="paymentsData"
-                      :current-value.sync="currentPayment"/>
-
-        </div>
-
-        <CartBlock v-if="this.deliveriesData" :products="products" :total-price="totalPrice"
-                   :total-products="totalProducts" :priceDelivery="currentPriceDelivery">
-          <button
-            class="cart__button button button--primary" type="submit">
-            Оформить заказ
-          </button>
-        </CartBlock>
-
-        <div class="cart__error form__error-block" v-if="formErrorMessage">
-          <h4>Заявка не отправлена!</h4>
-          <p>
-            {{ formErrorMessage }}
-          </p>
-        </div>
-      </form>
     </section>
   </main>
 </template>
 
 <script>
+import PageTitle from '@/components/PageTitle.vue';
 import BaseLoader from '@/components/BaseLoader.vue';
-import BaseFormText from '@/components/BaseFormText.vue';
-import BaseFormTextarea from '@/components/BaseFormTextarea.vue';
-import CartBlock from '@/components/CartBlock.vue';
+// import BaseFormErrorBlock from '@/components/BaseFormErrorBlock.vue';
 import CartOption from '@/components/CartOption.vue';
+import formGeneration from '@/components/FormGeneration.vue';
 import { API_BASE_URL } from '@/config';
 import { mapGetters } from 'vuex';
 import axios from 'axios';
 
 export default {
   name: 'OrderView',
+  pageData: {
+    pageTitle: 'Оформление заказа',
+    pageButtonText: 'Оформить заказ',
+    forms: [
+      {
+        id: 1,
+        title: 'ФИО',
+        placeholder: 'Введите ваше полное имя',
+        field: 'BaseFormText',
+        model: 'name',
+        rules: ['required'],
+        type: 'text',
+      },
+      {
+        id: 2,
+        title: 'Адрес доставки',
+        placeholder: 'Введите ваш адрес',
+        field: 'BaseFormText',
+        model: 'address',
+        rules: ['required'],
+        type: 'text',
+      },
+      {
+        id: 3,
+        title: 'Телефон',
+        placeholder: '+7(999)-999-99-99',
+        field: 'BaseFormText',
+        model: 'phone',
+        rules: ['required', 'tel'],
+        type: 'tel',
+      },
+      {
+        id: 4,
+        title: 'Email',
+        placeholder: 'Введи ваш Email',
+        field: 'BaseFormText',
+        model: 'email',
+        rules: ['required'],
+        type: 'email',
+      },
+      {
+        id: 5,
+        title: 'Комментарий к заказу',
+        placeholder: 'Ваши пожелания',
+        field: 'BaseFormTextarea',
+        model: 'comments',
+      },
+    ],
+  },
   data() {
     return {
       formData: {},
@@ -104,13 +108,26 @@ export default {
     };
   },
   components: {
+    PageTitle,
     BaseLoader,
-    BaseFormText,
-    BaseFormTextarea,
-    CartBlock,
+    formGeneration,
+    // BaseFormErrorBlock,
     CartOption,
   },
   methods: {
+    paths() {
+      return [
+        {
+          id: 1,
+          name: 'cart',
+          title: 'Корзина',
+        },
+        {
+          id: 2,
+          title: `${this.$options.pageData.pageTitle}`,
+        },
+      ];
+    },
     async order() {
       this.formError = {};
       this.formErrorMessage = '';

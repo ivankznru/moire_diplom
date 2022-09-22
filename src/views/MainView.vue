@@ -1,16 +1,6 @@
 <template>
   <main class="content container">
-    <div class="content__top">
-
-      <div class="content__row">
-        <h1 class="content__title">
-          Каталог
-        </h1>
-        <span class="content__info">
-          {{ countProducts }} {{ stringProduct(countProducts) }}
-        </span>
-      </div>
-    </div>
+    <PageTitle :title="$options.pageData.pageTitle" :count-products="countProducts"/>
 
     <div class="content__catalog">
 
@@ -20,39 +10,52 @@
                       :season.sync="filterSeason"/>
       <section class="catalog">
 
-        <div v-if="products.length === 0 && !productsLoading && !productsLoadingFailed">
+        <div v-if="!products.length && !productsLoading && !productsLoadingFailed">
           <h4>
-            Товаров, соответствующих вашему запросу, не обнаружено
+            {{ $options.pageData.noProductsFoundText }}
           </h4>
         </div>
 
+        <div class="block__option" v-if="products.length">
+          <span class="block__option__title">
+            {{ $options.pageData.numberProductsPageText }}
+          </span>
+          <label class="form__label form__label--small form__label--select">
+            <select class="form__select" name="category" v-model="productsPerPage">
+              <option v-for="item in displayingProducts" :key="item.id"
+                      :value="item.value">
+                {{ item.value }}
+              </option>
+            </select>
+          </label>
+        </div>
         <base-loader loader-title="Загрузка товаров" v-if="productsLoading"/>
-        <h2 v-else-if="productsLoadingFailed">Ошибка загрузки товаров, перезагрузите пожалуйста
-          страницу</h2>
+        <h2 v-else-if="productsLoadingFailed">{{ $options.pageData.errorLoadingProductsText }}</h2>
         <product-list :products="products" :colors="colorsProduct" v-else/>
 
         <base-pagination v-model="page" :count="countProducts" :per-page="productsPerPage"/>
-
       </section>
     </div>
   </main>
 </template>
 
 <script>
-import stringProduct from '@/helpers/stringProduct';
-// eslint-disable-next-line import/extensions
-import BaseLoader from '@/components/BaseLoader';
-// eslint-disable-next-line import/extensions
-import ProductFilter from '@/components/ProductFilter';
-// eslint-disable-next-line import/extensions
-import BasePagination from '@/components/BasePagination';
-// eslint-disable-next-line import/extensions
-import ProductList from '@/components/ProductList';
+import PageTitle from '@/components/PageTitle.vue';
+import BaseLoader from '@/components/BaseLoader.vue';
+import ProductFilter from '@/components/ProductFilter.vue';
+import BasePagination from '@/components/BasePagination.vue';
+import ProductList from '@/components/ProductList.vue';
 import axios from 'axios';
 import { API_BASE_URL } from '@/config';
 
 export default {
   name: 'MainView',
+  pageData: {
+    pageTitle: 'Каталог',
+    noProductsFoundText: 'Товаров, соответствующих вашему запросу, не обнаружено',
+    numberProductsPageText: 'Количество товаров на странице:',
+    errorLoadingProductsText: 'Ошибка загрузки товаров, перезагрузите пожалуйста страницу',
+  },
   data() {
     return {
       page: 1,
@@ -63,8 +66,29 @@ export default {
       filterColor: [],
       filterMaterial: [],
       filterSeason: [],
-      stringProduct,
 
+      displayingProducts: [
+        {
+          id: 1,
+          value: 6,
+        },
+        {
+          id: 2,
+          value: 9,
+        },
+        {
+          id: 3,
+          value: 12,
+        },
+        {
+          id: 4,
+          value: 15,
+        },
+        {
+          id: 5,
+          value: 18,
+        },
+      ],
       productsLoading: false,
       productsLoadingFailed: false,
 
@@ -73,6 +97,7 @@ export default {
   },
 
   components: {
+    PageTitle,
     BasePagination,
     ProductList,
     ProductFilter,
@@ -148,6 +173,9 @@ export default {
     filterColor() {
       this.loadProducts();
     },
+    productsPerPage() {
+      this.loadProducts();
+    },
   },
   created() {
     this.loadProducts();
@@ -155,6 +183,15 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss">
+.block__option {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 20px;
 
+  &__title {
+    margin-right: 10px;
+  }
+}
 </style>

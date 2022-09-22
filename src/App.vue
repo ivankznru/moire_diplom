@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <header-item/>
-    <router-view/>
+    <keep-alive include="OrderView">
+      <router-view/>
+    </keep-alive>
     <footer-item/>
   </div>
 </template>

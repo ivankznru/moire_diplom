@@ -3,40 +3,23 @@
     <BaseLoader loader-title="Загрузка товара"></BaseLoader>
   </main>
   <main class="content container" v-else-if="productData">
-    <div class="content__top">
-      <ul class="breadcrumbs">
-        <li class="breadcrumbs__item">
-          <router-link class="breadcrumbs__link" :to="{ name: 'main' }">
-            Каталог
-          </router-link>
-        </li>
-        <li class="breadcrumbs__item">
-          <router-link class="breadcrumbs__link" :to="{ name: 'main' }">
-            {{ product.category.title }}
-          </router-link>
-        </li>
-        <li class="breadcrumbs__item">
-          <span class="breadcrumbs__link">
-            {{ product.title }}
-          </span>
-        </li>
-      </ul>
-    </div>
+
+    <page-title :items="paths()"/>
 
     <section class="item">
       <div class="item__pics pics">
         <div class="pics__wrapper">
           <img width="570" height="570"
-               :src="productImage"
+               :src="productChangeImage"
                :alt="product.title">
         </div>
         <ul class="pics__list">
           <li class="pics__item" v-for="color in product.colors" :key="color.id">
             <a href="#" class="pics__link"
                @click.prevent="currentColor = color.color.id"
-               :class="{'pics__link--current': color.gallery[0].file.url === productImage}">
+               :class="{'pics__link--current': changeActive(color, productChangeImage)}">
               <img width="98" height="98"
-                   :src="color.gallery[0].file.url ? color.gallery[0].file.url : []"
+                   :src="changeSrc(color)"
                    :alt="product.title">
             </a>
           </li>
@@ -76,57 +59,20 @@
 
             <div class="message">
               <span class="message__loading" v-show="productAddSetting">
-                Добавляем товар в корзину...
+                {{ $options.pageData.addingProductText }}
                 </span>
               <span class="message__add" v-show="productAdded">
-                Товар добавлен в корзину
+                {{ $options.pageData.addedProductText }}
                 </span>
             </div>
 
-            <button class="item__button button button--primary" type="submit"
+            <button class="item__button button button--primary" ref="btn" type="submit"
                     :disabled="errorAdd() || productAddSetting">
-              В корзину
+              {{ $options.pageData.titleButton }}
             </button>
           </form>
         </div>
       </div>
-
-      <!-- На случай, если вдруг в API появится контент с "Информацией" и "Доставкой"
-      <div class="item__desc">
-        <ul class="tabs">
-          <li class="tabs__item">
-            <a class="tabs__link tabs__link--current">
-              Информация о товаре
-            </a>
-          </li>
-          <li class="tabs__item">
-            <a class="tabs__link" href="#">
-              Доставка и возврат
-            </a>
-          </li>
-        </ul>
-
-        <div class="item__content">
-          <h3>Состав:</h3>
-
-          <p>
-            60% хлопок<br>
-            30% полиэстер<br>
-          </p>
-
-          <h3>Уход:</h3>
-
-          <p>
-            Машинная стирка при макс. 30ºC короткий отжим<br>
-            Гладить при макс. 110ºC<br>
-            Не использовать машинную сушку<br>
-            Отбеливать запрещено<br>
-            Не подвергать химчистке<br>
-          </p>
-
-        </div>
-      </div>
-      -->
     </section>
   </main>
 </template>
@@ -134,25 +80,26 @@
 <script>
 import axios from 'axios';
 import numberFormat from '@/helpers/numberFormat';
-// eslint-disable-next-line import/extensions
-import CounterMenu from '@/components/CounterMenu';
-// eslint-disable-next-line import/extensions
-import BaseLoader from '@/components/BaseLoader';
-// eslint-disable-next-line import/extensions
-import BaseColor from '@/components/BaseColor';
-// eslint-disable-next-line import/extensions
-import BaseSelect from '@/components/BaseSelect';
+import PageTitle from '@/components/PageTitle.vue';
+import CounterMenu from '@/components/CounterMenu.vue';
+import BaseLoader from '@/components/BaseLoader.vue';
+import BaseColor from '@/components/BaseColor.vue';
+import BaseSelect from '@/components/BaseSelect.vue';
 import { API_BASE_URL, NO_IMAGE } from '@/config';
 import { mapActions, mapMutations } from 'vuex';
-// eslint-disable-next-line import/no-cycle
-import router from '@/router';
 
 export default {
   name: 'ProductView',
   filters: {
     numberFormat,
   },
+  pageData: {
+    titleButton: 'В корзину',
+    addingProductText: 'Добавляем товар в корзину...',
+    addedProductText: 'Товар добавлен в корзину',
+  },
   components: {
+    PageTitle,
     BaseLoader,
     CounterMenu,
     BaseSelect,
@@ -178,19 +125,15 @@ export default {
         ...item.color,
       })) : [];
     },
-    productImage: {
+    productChangeImage: {
       get() {
-        let value;
-        // eslint-disable-next-line no-plusplus
-        for (let i = 0; i < this.product.colors.length; i++) {
-          if (this.currentColor === this.product.colors[i].color.id || this.currentColor === null) {
-            value = this.product.colors[i].gallery ? this.product.colors[i].gallery[0].file.url : `${NO_IMAGE}`;
-            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-            this.currentColor = this.product.colors[i].color.id;
-            return value;
-          }
-        }
-        return value;
+        return this.product.colors
+          ?.find((color) => {
+            if (!this.currentColor) {
+              this.currentColor = color.color.id;
+            }
+            return this.currentColor === color.color.id;
+          })?.gallery?.[0].file.url || NO_IMAGE;
       },
       set(value) {
         this.$emit('update:productImage', value);
@@ -200,6 +143,25 @@ export default {
   methods: {
     ...mapMutations(['updateError']),
     ...mapActions(['addProductToCart']),
+    paths() {
+      return [
+        {
+          id: 1,
+          name: 'main',
+          title: `${this.product.category.title}`,
+        },
+        {
+          id: 2,
+          title: `${this.product.title}`,
+        },
+      ];
+    },
+    changeActive(value, computed) {
+      return value?.gallery?.[0].file.url === computed;
+    },
+    changeSrc(value) {
+      return value.gallery ? value.gallery[0].file.url : NO_IMAGE;
+    },
     errorAdd() {
       if (this.$store.state.error) {
         this.productAdded = false;
@@ -208,10 +170,10 @@ export default {
       }
       return this.$store.state.error;
     },
-    addToCart() {
+    async addToCart() {
       this.productAdded = false;
       this.productAddSetting = true;
-      this.addProductToCart({
+      await this.addProductToCart({
         productId: this.product.id,
         amount: this.productAmount,
         colorId: this.currentColor,
@@ -235,7 +197,7 @@ export default {
         }
       } catch {
         this.productsLoadingFailed = true;
-        await router.replace({ name: 'notFound' });
+        await this.$router.replace({ name: 'notFound' });
       }
     },
   },
@@ -250,6 +212,11 @@ export default {
 };
 </script>
 
-<style scoped>
-
+<style lang="scss">
+.pics__list {
+  img {
+    height: 100%;
+    object-fit: cover;
+  }
+}
 </style>

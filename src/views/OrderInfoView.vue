@@ -1,81 +1,17 @@
 <template>
   <main class="content container" v-if="orderData">
-    <div class="content__top">
-      <ul class="breadcrumbs">
-        <li class="breadcrumbs__item">
-          <router-link class="breadcrumbs__link" :to="{ name: 'main' }">
-            Каталог
-          </router-link>
-        </li>
-        <li class="breadcrumbs__item">
-          <router-link class="breadcrumbs__link" :to="{ name: 'cart' }">
-            Корзина
-          </router-link>
-        </li>
-        <li class="breadcrumbs__item">
-          <router-link class="breadcrumbs__link" :to="{ name: 'order' }">
-            Оформление заказа
-          </router-link>
-        </li>
-      </ul>
 
-      <h1 class="content__title">
-        Заказ оформлен <span>№ {{ orderData.id }}</span>
-      </h1>
-    </div>
+    <page-title :title="$options.pageData.pageTitle" :items="paths()" :order-data="orderData"/>
 
     <section class="cart">
       <form class="cart__form form" action="#" method="POST">
         <div class="cart__field">
           <p class="cart__message">
-            Благодарим за&nbsp;выбор нашего магазина. На&nbsp;Вашу почту придет письмо
-            с&nbsp;деталями заказа. Наши менеджеры свяжутся с&nbsp;Вами в&nbsp;течение часа для
-            уточнения деталей
-            доставки.
+            {{ $options.pageData.formDescription }}
           </p>
 
-          <ul class="dictionary">
-            <li class="dictionary__item">
-              <span class="dictionary__key">
-                Получатель
-              </span>
-              <span class="dictionary__value">
-                {{ orderData.name }}
-              </span>
-            </li>
-            <li class="dictionary__item">
-              <span class="dictionary__key">
-                Адрес доставки
-              </span>
-              <span class="dictionary__value">
-                {{ orderData.address }}
-              </span>
-            </li>
-            <li class="dictionary__item">
-              <span class="dictionary__key">
-                Телефон
-              </span>
-              <span class="dictionary__value">
-                {{ orderData.phone }}
-              </span>
-            </li>
-            <li class="dictionary__item">
-              <span class="dictionary__key">
-                Email
-              </span>
-              <span class="dictionary__value">
-                {{ orderData.email }}
-              </span>
-            </li>
-            <li class="dictionary__item">
-              <span class="dictionary__key">
-                Способ оплаты
-              </span>
-              <span class="dictionary__value">
-                {{ orderData.paymentType }}
-              </span>
-            </li>
-          </ul>
+          <dictionary-list :form="pageForm()"/>
+
         </div>
 
         <CartBlock :products="products" :total-products="totalProducts"
@@ -88,10 +24,22 @@
 
 <script>
 import CartBlock from '@/components/CartBlock.vue';
+import PageTitle from '@/components/PageTitle.vue';
+import DictionaryList from '@/components/DictionaryList.vue';
 
 export default {
   name: 'OrderInfoView',
-  components: { CartBlock },
+  pageData: {
+    pageTitle: 'Заказ оформлен',
+    formDescription: `Благодарим за\u00A0выбор нашего магазина. На\u00A0
+    Вашу почту придет письмо с\u00A0деталями заказа. Наши менеджеры свяжутся с\u00A0
+    Вами в\u00A0течение часа для уточнения деталей доставки.`,
+  },
+  components: {
+    CartBlock,
+    PageTitle,
+    DictionaryList,
+  },
   computed: {
     orderData() {
       return this.$store.state.orderInfo;
@@ -107,6 +55,51 @@ export default {
     },
     priceDelivery() {
       return this.orderData.deliveryType.price;
+    },
+  },
+  methods: {
+    pageForm() {
+      return [
+        {
+          id: 1,
+          name: 'Получатель',
+          data: this.orderData?.name,
+        },
+        {
+          id: 2,
+          name: 'Адрес доставки',
+          data: this.orderData?.address,
+        },
+        {
+          id: 3,
+          name: 'Телефон',
+          data: this.orderData?.phone,
+        },
+        {
+          id: 4,
+          name: 'Email',
+          data: this.orderData?.email,
+        },
+        {
+          id: 5,
+          name: 'Способ оплаты',
+          data: this.orderData?.paymentType,
+        },
+      ];
+    },
+    paths() {
+      return [
+        {
+          id: 1,
+          name: 'cart',
+          title: 'Корзина',
+        },
+        {
+          id: 2,
+          name: 'order',
+          title: 'Оформление заказа',
+        },
+      ];
     },
   },
   watch: {
