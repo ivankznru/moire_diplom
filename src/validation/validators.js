@@ -2,26 +2,25 @@ import textErrors from '@/validation/textErrors';
 
 export default {
   required: (val) => !val && textErrors.required,
+  payment: (val) => !val && textErrors.payment,
+  deliveries: (val) => !val && textErrors.deliveries,
   // проверка на tel, если нет то возвращаем текст ошибки
-  tel: (val) => Number(val.length) !== 11 && textErrors.tel,
   // Оставим только цифры для проверки на длину номера телефона
-  replaceNumber(number) {
-    return number.replace(/[^/\d]/g, '');
-  },
-  email: (val) => val && textErrors.email,
-  validEmail(email) {
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|(([a-zA-Z\-\d]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(email);
+  tel: (val) => Number(val?.replace(/[^/\d]/g, '').length) !== 11 && textErrors.tel,
+  // Проверка на наличие символов
+  email: (val) => {
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return !re.test(val) && val && textErrors.email;
   },
   // проверка на количество символов в строке "Комментарий"
-  comments: (val) => String(val).length >= 15 && textErrors.comments,
+  comments: (val) => String(val).length <= 15 && val && textErrors.comments,
   // проверка на количество слов для ФИО
-  name: (val) => val.length >= 3 && textErrors.name,
-  splitString(stringToSplit, separator) {
-    const arr = stringToSplit.split(separator);
-    if (arr.length === 3 && arr[2] !== '') {
-      return arr;
+  name: (val) => {
+    let check = false;
+    const arr = val?.split(' ');
+    if (arr?.length === 3 && arr[2] !== '') {
+      check = true;
     }
-    return false;
+    return !check && val && textErrors.name;
   },
 };

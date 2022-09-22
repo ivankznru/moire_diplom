@@ -1,4 +1,4 @@
-template>
+<template>
   <div class="cart__options">
     <h3 class="cart__title">{{ title }}</h3>
     <ul class="cart__options options">

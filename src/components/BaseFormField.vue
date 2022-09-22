@@ -11,7 +11,7 @@ export default {
   name: 'BaseFormField',
   props: {
     form: Object,
-    error: String,
+    error: [String, Boolean],
   },
 };
 </script>

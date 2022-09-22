@@ -15,9 +15,7 @@ export default {
     type: {
       default: 'text',
     },
-    error: {
-      type: String,
-    },
+    error: [String, Boolean],
   },
 };
 </script>

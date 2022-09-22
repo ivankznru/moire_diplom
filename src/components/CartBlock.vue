@@ -10,9 +10,11 @@
     </ul>
 
     <div class="cart__total">
-      <p>Доставка: <b>{{ priceDelivery }} ₽</b></p>
-      <p>Итого: <b>{{ totalProducts }} {{ stringProduct(totalProducts) }}</b> на сумму
-        <b>{{ (totalPrice) | numberFormat }} ₽</b>
+      <p v-if="priceDelivery">Доставка: <b>{{ priceDelivery }} ₽</b></p>
+      <p>Итого: <b>{{ totalProducts }}
+        {{ stringProduct(totalProducts) }}</b> на
+        сумму
+        <b>{{ totalPrice | numberFormat }} ₽</b>
       </p>
     </div>
 
@@ -30,7 +32,9 @@ export default {
     products: {},
     totalPrice: {},
     totalProducts: {},
-    priceDelivery: {},
+    priceDelivery: {
+      default: 0,
+    },
   },
   filters: {
     numberFormat,

@@ -7,7 +7,10 @@
     </li>
 
     <li class="breadcrumbs__item" v-for="item in items" :key="item.id">
-      <router-link class="breadcrumbs__link" :to="{ name: item.name }" v-if="item.name">
+      <router-link class="breadcrumbs__link"
+                   :to="{ name: item.name,
+                    query: { categoryId: item.query } }"
+                   v-if="item.name">
         {{ item.title }}
       </router-link>
 
