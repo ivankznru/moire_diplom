@@ -31,7 +31,8 @@
     </div>
 
     <PopUpProductItem :pop-up-show="popUpShow" :product="product" :colors="colors"
-                      :current-pop-up="computedPopUpShow" @closePopUp="closePopUp()"/>
+                      :current-pop-up="computedPopUpShow" @closePopUp="closePopUp()"
+                      ref="popUp"/>
   </li>
 </template>
 
@@ -66,13 +67,15 @@ export default {
       }
     },
     computedPopUpShow() {
-      this.productCartLoading = true;
+      if (!this.$refs.popUp.productData) {
+        this.productCartLoading = true;
+      }
       clearTimeout(this.loadAddProduct);
       if (this.popUpShow !== true) {
         this.loadAddProduct = setTimeout(() => {
           this.popUpShow = !this.popUpShow;
           this.productCartLoading = false;
-        }, 1000);
+        }, 400);
       } else {
         this.popUpShow = !this.popUpShow;
         this.productCartLoading = false;

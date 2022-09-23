@@ -2,17 +2,21 @@
   <aside class="filter">
     <h2 class="filter__title">Фильтры</h2>
 
-    <form class="filter__form form" action="#" method="get">
+    <form class="filter__form form">
       <fieldset class="form__block">
         <legend class="form__legend">Цена</legend>
         <label class="form__label form__label--price" for="priceFrom">
           <input class="form__input" type="text" id="priceFrom" name="min-price"
-                 v-model.number="currentPriceFrom">
+                 placeholder="0"
+                 v-model.number="currentPriceFrom"
+                 @input="changeFilter({ filter: 'priceFrom', value: currentPriceFrom })">
           <span class="form__value">От</span>
         </label>
         <label class="form__label form__label--price" for="priceTo">
           <input class="form__input" type="text" id="priceTo" name="max-price"
-                 v-model.number="currentPriceTo">
+                 placeholder="0"
+                 v-model.number="currentPriceTo"
+                 @input="changeFilter({ filter: 'priceTo', value: currentPriceTo })">
           <span class="form__value">До</span>
         </label>
       </fieldset>
@@ -21,7 +25,9 @@
         <legend class="form__legend">Категория</legend>
         <label class="form__label form__label--select" for="category">
           <select class="form__select" id="category" name="category"
-                  v-model.number="currentCategoryId">
+                  v-model.number="currentCategoryId"
+                  @change="changeFilter(
+                    { filter: 'categoryId', value: currentCategoryId })">
             <option value="0">Все категории</option>
             <option v-for="category in categories" :value="category.id" :key="category.id">
               {{ category.title }}
@@ -69,10 +75,11 @@
       </fieldset>
 
       <button class="filter__submit button button--primary" type="submit" @click.prevent="submit()">
-        Применить
+        {{ $options.componentData.buttonSubmitText }}
       </button>
-      <button class="filter__reset button button--second" type="button" @click.prevent="reset">
-        Сбросить
+      <button class="filter__reset button button--second" type="button" @click.prevent="reset"
+              :disabled="!checkedObject">
+        {{ $options.componentData.buttonResetText }}
       </button>
     </form>
   </aside>
@@ -86,15 +93,21 @@ import { API_BASE_URL } from '@/config';
 export default {
   name: 'ProductFilter',
   components: { BaseColor },
-  props: ['priceFrom', 'priceTo', 'categoryId', 'color', 'page', 'material', 'season'],
+  componentData: {
+    buttonSubmitText: 'Применить',
+    buttonResetText: 'Сбросить',
+  },
+  props: ['page'],
   data() {
     return {
-      currentPriceFrom: 0,
-      currentPriceTo: 0,
+      currentPriceFrom: null,
+      currentPriceTo: null,
       currentCategoryId: 0,
       currentColor: [],
       currentMaterial: [],
       currentSeason: [],
+
+      currentQuery: {},
 
       categoriesData: null,
       materialsData: null,
@@ -103,6 +116,9 @@ export default {
     };
   },
   computed: {
+    checkedObject() {
+      return Object.keys(this.$route.query).length;
+    },
     categories() {
       return this.categoriesData ? this.categoriesData.items : [];
     },
@@ -117,15 +133,6 @@ export default {
     },
   },
   watch: {
-    priceFrom(value) {
-      this.currentPriceFrom = value;
-    },
-    priceTo(value) {
-      this.currentPriceTo = value;
-    },
-    categoryId(value) {
-      this.currentCategoryId = value;
-    },
     color(value) {
       this.currentColor = value;
     },
@@ -137,22 +144,46 @@ export default {
     },
   },
   methods: {
-    submit() {
-      this.$emit('update:priceFrom', this.currentPriceFrom);
-      this.$emit('update:priceTo', this.currentPriceTo);
-      this.$emit('update:categoryId', this.currentCategoryId);
-      this.$emit('update:color', this.currentColor);
-      this.$emit('update:material', this.currentMaterial);
-      this.$emit('update:season', this.currentSeason);
+    changeFilter({
+      filter,
+      value,
+    }) {
+      this.currentQuery = {
+        ...this.currentQuery,
+        [filter]: value,
+      };
+    },
+
+    async submit() {
+      if (this.$route.query.categoryId) {
+        this.currentQuery = {
+          ...this.currentQuery,
+          categoryId: this.$route.query.categoryId,
+        };
+      }
+      await this.$router.push({
+        query: {
+          ...this.currentQuery,
+          colorIds: [...this.currentColor],
+          materialIds: [...this.currentMaterial],
+          seasonIds: [...this.currentSeason],
+        },
+      });
       this.$emit('update:page', 1);
     },
-    reset() {
-      this.$emit('update:priceFrom', 0);
-      this.$emit('update:priceTo', 0);
-      this.$emit('update:categoryId', 0);
-      this.$emit('update:color', []);
-      this.$emit('update:material', []);
-      this.$emit('update:season', []);
+    async reset() {
+      this.currentQuery = {};
+      if (this.$route.query) {
+        await this.$router.push({
+          query: null,
+        });
+      }
+      this.currentColor = [];
+      this.currentSeason = [];
+      this.currentMaterial = [];
+      this.currentPriceTo = null;
+      this.currentPriceFrom = null;
+      this.currentCategoryId = 0;
       this.$emit('update:page', 1);
     },
     async loadCategories() {
@@ -181,12 +212,40 @@ export default {
       });
       this.seasonsData = await response.data;
     },
+    createdValueArr(item, value) {
+      if (this.$route.query[value]) {
+        if (!item.length) {
+          if (typeof this.$route.query[value] !== 'string') {
+            this.$route.query[value].forEach((p) => {
+              item.push(+p);
+            });
+          } else {
+            item.push(+this.$route.query[value]);
+          }
+        }
+      }
+    },
   },
-  created() {
-    this.loadCategories();
-    this.loadColors();
-    this.loadMaterials();
-    this.loadSeasons();
+  async created() {
+    await this.createdValueArr(this.currentColor, 'colorIds');
+    await this.createdValueArr(this.currentSeason, 'seasonIds');
+    await this.createdValueArr(this.currentMaterial, 'materialIds');
+    await this.createdValueArr(this.currentMaterial, 'materialIds');
+
+    if (this.$route.query.priceFrom) {
+      this.currentPriceFrom = +this.$route.query.priceFrom;
+    }
+    if (this.$route.query.priceFrom) {
+      this.currentPriceTo = +this.$route.query.priceTo;
+    }
+    if (this.$route.query.categoryId) {
+      this.currentCategoryId = +this.$route.query.categoryId;
+    }
+
+    await this.loadCategories();
+    await this.loadColors();
+    await this.loadMaterials();
+    await this.loadSeasons();
   },
 };
 </script>

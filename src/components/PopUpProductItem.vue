@@ -38,19 +38,19 @@
 
           <div class="message">
               <span class="message__loading" v-show="productAddSetting">
-                Добавляем товар в корзину...
+                {{ $options.componentData.productAddingText }}
               </span>
-            <span class="message__add" v-show="productAdded">
-                Товар добавлен в корзину
-            </span>
           </div>
 
           <button class="item__button button button--primary" type="submit"
                   :disabled="errorAdd() || productAddSetting">
-            В корзину
+            {{ $options.componentData.buttonText }}
           </button>
         </div>
       </form>
+    </div>
+    <div class="add__block" v-else-if="computedProductAdd()">
+      {{ $options.componentData.productAddText }}
     </div>
   </transition>
 </template>
@@ -66,6 +66,11 @@ import changeImage from '@/mixins/changeImage';
 
 export default {
   name: 'PopUpProductItem',
+  componentData: {
+    productAddText: 'Товар добавлен в корзину',
+    productAddingText: 'Добавляем товар в корзину...',
+    buttonText: 'В корзину',
+  },
   props: {
     currentPopUp: {},
     product: {},
@@ -120,7 +125,7 @@ export default {
       clearTimeout(this.loadAddProduct);
       this.loadAddProduct = setTimeout(() => {
         this.productAddSetting = false;
-        // this.productAdded = true;
+        this.productAdded = true;
         this.$emit('closePopUp', false);
       }, 1000);
     },
@@ -151,10 +156,19 @@ export default {
       }
       return this.$store.state.error;
     },
+    computedProductAdd() {
+      if (this.productAdded) {
+        clearTimeout(this.productAdd);
+        this.productAdd = setTimeout(() => {
+          this.productAdded = false;
+        }, 1000);
+      }
+      return this.productAdded;
+    },
   },
   watch: {
-    popUpShow() {
-      this.loadProduct();
+    async popUpShow() {
+      await this.loadProduct();
     },
   },
 };
@@ -194,5 +208,16 @@ export default {
       }
     }
   }
+}
+
+.add__block {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  padding: 20px;
+  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 20px;
+  z-index: 10;
 }
 </style>

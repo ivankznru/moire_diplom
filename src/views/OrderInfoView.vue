@@ -14,10 +14,10 @@
 
         </div>
 
-        <CartBlock :products="products" :total-products="totalProducts"
-                   :total-price="totalPrice"
-                   :price-delivery="priceDelivery"/>
       </form>
+      <CartBlock :products="products" :total-products="totalProducts"
+                 :total-price="totalPrice"
+                 :price-delivery="priceDelivery"/>
     </section>
   </main>
 </template>
@@ -51,7 +51,7 @@ export default {
       return this.orderData.basket.items.reduce((acc, item) => item.quantity + acc, 0);
     },
     totalPrice() {
-      return this.orderData.totalPrice;
+      return this.orderData.totalPrice - Number(this.orderData.deliveryType.price);
     },
     priceDelivery() {
       return this.orderData.deliveryType.price;
