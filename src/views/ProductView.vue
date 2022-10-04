@@ -148,11 +148,13 @@ export default {
         {
           id: 1,
           name: 'main',
+          query: this.product.category.id,
           title: `${this.product.category.title}`,
         },
         {
           id: 2,
           title: `${this.product.title}`,
+          category: this.product.category.id,
         },
       ];
     },

@@ -1,6 +1,5 @@
 <template>
   <form class="cart__form form" @submit.prevent="checkForm">
-    <div class="cart__field">
       <div class="cart__data">
           <component :is="item.field" v-for="(item, index) in form" :key="index"
                      :form="item" :value="data[item.model]" @input="onInput(item, $event)"
