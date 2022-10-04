@@ -1,4 +1,3 @@
-
 # final-project-shop
 
 ## Project setup

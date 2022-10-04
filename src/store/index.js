@@ -1,14 +1,9 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import axios from 'axios';
-import { API_BASE_URL } from '@/config';
+import { client } from '@/config';
 import router from '@/router';
 
 Vue.use(Vuex);
-
-// const client = axios.create({
-//   baseURL: API_BASE_URL,
-// });
 
 export default new Vuex.Store({
   state: {
@@ -16,6 +11,8 @@ export default new Vuex.Store({
 
     userAccessKey: null,
     cartProductsData: [],
+
+    productsDataAll: null,
 
     orderInfo: null,
     error: false,
@@ -42,12 +39,25 @@ export default new Vuex.Store({
     totalProducts(state, getters) {
       return getters.cartDetailProducts.reduce((acc, item) => (item.amount) + acc, 0);
     },
+    maxProductPrice(state) {
+      let value = null;
+      const arr = state.productsDataAll?.map((item) => {
+        const { price } = item;
+        return price;
+      });
+      if (state.productsDataAll) {
+        value = Math.max.apply(null, arr);
+      }
+      return value;
+    },
   },
   mutations: {
+    updateProductsAll(state, items) {
+      state.productsDataAll = items;
+    },
     updateOrderInfo(state, orderInfo) {
       state.orderInfo = orderInfo;
     },
-
     resetCart(state) {
       state.cartProducts = [];
       state.cartProductsData = [];
@@ -86,10 +96,17 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    async loadCart(context) {
-      const response = await axios({
+    async loadAllProducts(context) {
+      const response = await client({
         method: 'GET',
-        url: `${API_BASE_URL}/api/baskets`,
+        url: '/api/products',
+      });
+      context.commit('updateProductsAll', response.data.items);
+    },
+    async loadCart(context) {
+      const response = await client({
+        method: 'GET',
+        url: '/api/baskets',
         params: {
           userAccessKey: context.state.userAccessKey,
         },
@@ -107,9 +124,9 @@ export default new Vuex.Store({
       sizeId,
     }) {
       try {
-        const response = await axios({
+        const response = await client({
           method: 'POST',
-          url: `${API_BASE_URL}/api/baskets/products`,
+          url: '/api/baskets/products',
           data: {
             productId,
             quantity: amount,
@@ -138,9 +155,9 @@ export default new Vuex.Store({
       if (amount < 1) {
         return;
       }
-      const response = await axios({
+      const response = await client({
         method: 'PUT',
-        url: `${API_BASE_URL}/api/baskets/products`,
+        url: '/api/baskets/products',
         data: {
           basketItemId,
           quantity: amount,
@@ -155,8 +172,8 @@ export default new Vuex.Store({
     async deleteProductCart(context, basketItemId) {
       context.commit('deleteProduct', basketItemId);
       try {
-        const response = await axios({
-          url: `${API_BASE_URL}/api/baskets/products`,
+        const response = await client({
+          url: '/api/baskets/products',
           method: 'DELETE',
           data: {
             basketItemId,
@@ -172,9 +189,9 @@ export default new Vuex.Store({
     },
     async loadOrderInfoView(context, orderId) {
       try {
-        const response = await axios({
+        const response = await client({
           method: 'GET',
-          url: `${API_BASE_URL}/api/orders/${orderId}`,
+          url: `/api/orders/${orderId}`,
           params: {
             userAccessKey: context.state.userAccessKey,
           },

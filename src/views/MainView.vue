@@ -4,7 +4,7 @@
 
     <div class="content__catalog">
 
-      <product-filter :page.sync="page" ref="filter"/>
+      <product-filter :page.sync="page" ref="filter" :max-price="maxProductPrice()"/>
       <section class="catalog">
 
         <div v-if="!products.length && !productsLoading && !productsLoadingFailed">
@@ -42,8 +42,8 @@ import BaseLoader from '@/components/BaseLoader.vue';
 import ProductFilter from '@/components/ProductFilter.vue';
 import BasePagination from '@/components/BasePagination.vue';
 import ProductList from '@/components/ProductList.vue';
-import axios from 'axios';
-import { API_BASE_URL } from '@/config';
+import { client } from '@/config';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'MainView',
@@ -114,6 +114,8 @@ export default {
     },
   },
   methods: {
+    ...mapGetters(['maxProductPrice']),
+    ...mapActions(['loadAllProducts']),
     watchFilter(value) {
       if (typeof this.$route.query[value] === 'string'
         && this.$route.query[value] !== this.$route.query.categoryId
@@ -127,9 +129,9 @@ export default {
       try {
         this.productsLoading = true;
         this.productsLoadingFailed = false;
-        const response = await axios({
+        const response = await client({
           method: 'GET',
-          url: `${API_BASE_URL}/api/products`,
+          url: '/api/products',
           params: {
             page: this.page,
             limit: this.productsPerPage,
@@ -165,7 +167,7 @@ export default {
     },
   },
   async created() {
-    await this.loadProducts();
+    await Promise.all([this.loadProducts(), this.loadAllProducts()]);
   },
 };
 </script>
