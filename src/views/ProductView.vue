@@ -67,7 +67,7 @@
             </div>
 
             <button class="item__button button button--primary" ref="btn" type="submit"
-                    :disabled="errorAdd() || productAddSetting">
+                    :disabled="errorAdd() || productAddSetting || !productAmount">
               {{ $options.pageData.titleButton }}
             </button>
           </form>
@@ -78,14 +78,13 @@
 </template>
 
 <script>
-import axios from 'axios';
 import numberFormat from '@/helpers/numberFormat';
 import PageTitle from '@/components/PageTitle.vue';
 import CounterMenu from '@/components/CounterMenu.vue';
 import BaseLoader from '@/components/BaseLoader.vue';
 import BaseColor from '@/components/BaseColor.vue';
 import BaseSelect from '@/components/BaseSelect.vue';
-import { API_BASE_URL, NO_IMAGE } from '@/config';
+import { client, NO_IMAGE } from '@/config';
 import { mapActions, mapMutations } from 'vuex';
 
 export default {
@@ -192,7 +191,10 @@ export default {
       try {
         this.productLoading = true;
         this.productsLoadingFailed = false;
-        const response = await axios(`${API_BASE_URL}/api/products/${this.$route.params.id}`);
+        const response = await client({
+          method: 'GET',
+          url: `/api/products/${this.$route.params.id}`,
+        });
         this.productData = response.data;
         if (response.data) {
           this.productLoading = false;
@@ -205,8 +207,8 @@ export default {
   },
   watch: {
     '$route.params.id': {
-      handler() {
-        this.loadProduct();
+      async handler() {
+        await this.loadProduct();
       },
       immediate: true,
     },

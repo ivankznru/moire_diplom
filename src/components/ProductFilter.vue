@@ -14,7 +14,7 @@
         </label>
         <label class="form__label form__label--price" for="priceTo">
           <input class="form__input" type="text" id="priceTo" name="max-price"
-                 placeholder="0"
+                 :placeholder="maxPrice"
                  v-model.number="currentPriceTo"
                  @input="changeFilter({ filter: 'priceTo', value: currentPriceTo })">
           <span class="form__value">До</span>
@@ -78,7 +78,7 @@
         {{ $options.componentData.buttonSubmitText }}
       </button>
       <button class="filter__reset button button--second" type="button" @click.prevent="reset"
-              :disabled="!checkedObject">
+              v-if="checkedObject">
         {{ $options.componentData.buttonResetText }}
       </button>
     </form>
@@ -87,8 +87,7 @@
 
 <script>
 import BaseColor from '@/components/BaseColor.vue';
-import axios from 'axios';
-import { API_BASE_URL } from '@/config';
+import { client } from '@/config';
 
 export default {
   name: 'ProductFilter',
@@ -97,7 +96,7 @@ export default {
     buttonSubmitText: 'Применить',
     buttonResetText: 'Сбросить',
   },
-  props: ['page'],
+  props: ['page', 'maxPrice'],
   data() {
     return {
       currentPriceFrom: null,
@@ -155,10 +154,14 @@ export default {
     },
 
     async submit() {
-      if (this.$route.query.categoryId) {
+      if (this.$route.query.categoryId && this.$route.query.categoryId === this.currentCategoryId) {
         this.currentQuery = {
           ...this.currentQuery,
           categoryId: this.$route.query.categoryId,
+        };
+      } else {
+        this.currentQuery = {
+          ...this.currentQuery,
         };
       }
       await this.$router.push({
@@ -187,32 +190,34 @@ export default {
       this.$emit('update:page', 1);
     },
     async loadCategories() {
-      const response = await axios({
+      const response = await client({
         method: 'GET',
-        url: `${API_BASE_URL}/api/productCategories`,
+        url: '/api/productCategories',
       });
       this.categoriesData = response.data;
     },
     async loadColors() {
-      const response = await axios({
+      const response = await client({
         method: 'GET',
-        url: `${API_BASE_URL}/api/colors`,
+        url: '/api/colors',
       });
       this.colorsData = response.data;
     },
     async loadMaterials() {
-      const response = await axios(`${API_BASE_URL}/api/materials`, {
+      const response = await client({
         method: 'GET',
+        url: '/api/materials',
       });
       this.materialsData = await response.data;
     },
     async loadSeasons() {
-      const response = await axios(`${API_BASE_URL}/api/seasons`, {
+      const response = await client({
         method: 'GET',
+        url: '/api/seasons',
       });
       this.seasonsData = await response.data;
     },
-    createdValueArr(item, value) {
+    async createdValueArr(item, value) {
       if (this.$route.query[value]) {
         if (!item.length) {
           if (typeof this.$route.query[value] !== 'string') {
@@ -227,10 +232,17 @@ export default {
     },
   },
   async created() {
-    await this.createdValueArr(this.currentColor, 'colorIds');
-    await this.createdValueArr(this.currentSeason, 'seasonIds');
-    await this.createdValueArr(this.currentMaterial, 'materialIds');
-    await this.createdValueArr(this.currentMaterial, 'materialIds');
+    const values = [
+      await this.createdValueArr(this.currentColor, 'colorIds'),
+      await this.createdValueArr(this.currentSeason, 'seasonIds'),
+      await this.createdValueArr(this.currentMaterial, 'materialIds'),
+
+      await this.loadCategories(),
+      await this.loadColors(),
+      await this.loadMaterials(),
+      await this.loadSeasons(),
+    ];
+    await Promise.all([values]);
 
     if (this.$route.query.priceFrom) {
       this.currentPriceFrom = +this.$route.query.priceFrom;
@@ -241,11 +253,6 @@ export default {
     if (this.$route.query.categoryId) {
       this.currentCategoryId = +this.$route.query.categoryId;
     }
-
-    await this.loadCategories();
-    await this.loadColors();
-    await this.loadMaterials();
-    await this.loadSeasons();
   },
 };
 </script>
