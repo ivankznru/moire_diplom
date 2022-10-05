@@ -1,7 +1,7 @@
 <template>
   <main class="content container" v-if="orderData">
 
-    <page-title :title="$options.pageData.pageTitle" :items="paths()" :order-data="orderData"/>
+    <page-title :title="$options.pageData.pageTitle" :order-data="orderData"/>
 
     <section class="cart">
       <form class="cart__form form" action="#" method="POST">
@@ -87,25 +87,11 @@ export default {
         },
       ];
     },
-    paths() {
-      return [
-        {
-          id: 1,
-          name: 'cart',
-          title: 'Корзина',
-        },
-        {
-          id: 2,
-          name: 'order',
-          title: 'Оформление заказа',
-        },
-      ];
-    },
   },
   watch: {
     '$route.params.id': {
-      handler() {
-        this.$store.dispatch('loadOrderInfoView', +this.$route.params.id);
+      async handler() {
+        await this.$store.dispatch('loadOrderInfoView', +this.$route.params.id);
       },
       immediate: true,
     },

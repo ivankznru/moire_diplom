@@ -37,9 +37,8 @@ import BaseLoader from '@/components/BaseLoader.vue';
 import BaseFormErrorBlock from '@/components/BaseFormErrorBlock.vue';
 import formGeneration from '@/components/FormGeneration.vue';
 import CheckOutCart from '@/components/CheckOutCart.vue';
-import { API_BASE_URL } from '@/config';
+import { client } from '@/config';
 import { mapGetters } from 'vuex';
-import axios from 'axios';
 
 export default {
   name: 'OrderView',
@@ -85,9 +84,9 @@ export default {
       this.formErrorMessage = '';
       this.sendingLoading = true;
       try {
-        const response = await axios({
+        const response = await client({
           method: 'POST',
-          url: `${API_BASE_URL}/api/orders`,
+          url: '/api/orders',
           params: {
             userAccessKey: this.$store.state.userAccessKey,
           },
@@ -111,16 +110,16 @@ export default {
       }
     },
     async loadDeliveries() {
-      const response = await axios({
+      const response = await client({
         method: 'GET',
-        url: `${API_BASE_URL}/api/deliveries`,
+        url: '/api/deliveries',
       });
       this.deliveriesData = response.data;
     },
     async loadPayments() {
-      const response = await axios({
+      const response = await client({
         method: 'GET',
-        url: `${API_BASE_URL}/api/payments`,
+        url: '/api/payments',
         params: {
           deliveryTypeId: this.formData.deliveryTypeId || 1,
         },
