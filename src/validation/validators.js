@@ -18,7 +18,7 @@ export default {
   name: (val) => {
     let check = false;
     const arr = val?.split(' ');
-    if (arr?.length === 3 && arr[2] !== '') {
+    if (arr?.length >= 3 && arr[2] !== '') {
       check = true;
     }
     return !check && val && textErrors.name;

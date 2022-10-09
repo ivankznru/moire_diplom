@@ -8,7 +8,7 @@
     </button>
 
     <label for="count-one">
-      <input type="number" :value="amount" name="count" id="count-one">
+      <input type="number" v-model="count" name="count" id="count-one" min="1">
     </label>
 
     <button class="button" type="button" aria-label="Добавить один товар"
@@ -29,6 +29,19 @@ export default {
     return {
       currentAmount: 1,
     };
+  },
+  computed: {
+    count: {
+      get() {
+        return +this.amount;
+      },
+      set(value) {
+        if (value < 1) {
+          value = 1;
+        }
+        this.$emit('update:amount', +value);
+      },
+    },
   },
   methods: {
     addProduct() {

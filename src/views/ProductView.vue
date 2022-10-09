@@ -67,7 +67,7 @@
             </div>
 
             <button class="item__button button button--primary" ref="btn" type="submit"
-                    :disabled="errorAdd() || productAddSetting || !productAmount">
+                    :disabled="errorAdd() || productAddSetting || productAmount < 1">
               {{ $options.pageData.titleButton }}
             </button>
           </form>

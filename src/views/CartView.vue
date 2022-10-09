@@ -1,6 +1,7 @@
 <template>
   <main class="content container">
-    <page-title :title="$options.pageData.pageTitle" :items="paths()"/>
+    <page-title :title="$options.pageData.pageTitle" :items="paths()"
+                :count-products="totalProducts"/>
 
     <section class="cart">
       <form class="cart__form form" action="#" method="POST">
